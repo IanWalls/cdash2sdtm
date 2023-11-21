@@ -8,6 +8,8 @@
 
 
 <script>
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css'
 export default {
   data () {
     return {
@@ -17,6 +19,7 @@ export default {
   methods: {
     triggerDownloadDefine () {
       const projectId = sessionStorage.getItem("projectId")
+      nprogress.start()
       this.$api.define.downloadDefine({
         sdtmVersion: "",
         CTVersion: "",
@@ -26,10 +29,12 @@ export default {
         // 下载到本地
         window.location.href = url
       })
+      nprogress.done()
     },
     triggerDownloadSdtm(){
       const projectId = sessionStorage.getItem("projectId")
       const path = sessionStorage.getItem("dataset")
+      nprogress.start()
       this.$api.define.downloadSdtm({
         projectId: projectId,
         path:path
@@ -38,6 +43,7 @@ export default {
         // 下载到本地
         window.location.href = url
       })
+      nprogress.done()
     }
   }
 }

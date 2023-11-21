@@ -88,6 +88,8 @@
 </template>
 
 <script>
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css'
 export default {
   data () {
     return {
@@ -215,13 +217,17 @@ export default {
         that.$refs.aCRFUpload.submit()
         // 上传文件没有改变，才调用接口
         if (that.acrfFormData) {
+          nprogress.start();
           that.configData.aCRF = (await that.$api.config.upload(that.acrfFormData)).data
+          nprogress.done();
         }
 
         // dataset文件手动上传
         that.$refs.datasetUpload.submit()
         if (that.datasetFormData) {
+          nprogress.start()
           that.configData.dataset = (await that.$api.config.uploadDataset(that.datasetFormData)).data
+          nprogress.done()
         }
         console.log(that.configData)
 
@@ -233,7 +239,9 @@ export default {
 
         // 提交表单
         // 获取projectId
+        nprogress.start()
         const projectId = (await that.$api.config.save(that.configData)).data.data
+        nprogress.done()
         sessionStorage.setItem("projectId", projectId)
 
         // 保存表单数据
@@ -257,11 +265,17 @@ export default {
       // default input
       this.configData.filePurpose = '递交'
       let res
+      nprogress.start()
       res = await this.$api.config.querySdtmig()
+      nprogress.done()
       this.sdtmigList = res.data.data
+      nprogress.start()
       res = await this.$api.config.queryDefineVersion()
+      nprogress.done()
       this.defineXMLList = res.data.data
+      nprogress.start()
       res = await this.$api.config.queryCtVersion()
+      nprogress.done()
       this.ctVersionList = res.data.data
     },
 

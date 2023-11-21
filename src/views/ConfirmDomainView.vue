@@ -71,6 +71,8 @@
 </template>
 
 <script>
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css'
 export default {
   data () {
     return {
@@ -125,7 +127,9 @@ export default {
         "version": ""
       }
       //queryAll
+      nprogress.start()
       let res = await this.$api.confirmDomain.queryAllDomain(param)
+      nprogress.done()
       console.log(res)
       this.domainAllList = res.data.data.domainAllList
       // 启用
@@ -165,6 +169,8 @@ export default {
         "ctVersion": ""
       }
       console.log('param', param)
+      
+      nprogress.start()
       this.$api.confirmDomain.queryDomInfo(param).then(res => {
         console.log(res)
         const newDomainInfo = {
@@ -174,6 +180,7 @@ export default {
         }
         this.domainInfoSuggestedList.push(newDomainInfo)
       })
+      nprogress.done()
     },
     // 删除域
     deleteDomain (row) {
@@ -186,10 +193,12 @@ export default {
         "projectId": this.projectId,
         "domain": row.domain
       }
+      nprogress.start()
       this.$api.confirmDomain.deleteDom(param).then(res => {
         console.log(res)
         // this.domainInfoSuggestedList.delete?(res.data)
       })
+      nprogress.done()
     },
     // save
     submitForm () {
@@ -199,9 +208,11 @@ export default {
         return x
       })
       // console.log(savedList)
+      nprogress.start()
       this.$api.confirmDomain.save(savedList).then(res => {
         // console.log(res)
       })
+      nprogress.done()
       return true
     }
   },
