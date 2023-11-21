@@ -322,6 +322,8 @@
 </template>
 
 <script>
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css'
 export default {
   data () {
     return {
@@ -403,7 +405,9 @@ export default {
         "sdtmVersion": this.sdtmVersion
       }
       //domainList
+      nprogress.start()
       const res = await this.$api.varSetting.queryAllDomain(param)
+      nprogress.done()
       this.domainList = res.data.data
     },
     copyVarInfo (varSettingVo, showVar) {
@@ -482,7 +486,9 @@ export default {
       this.domain = domain
 
       //varInfoList,和后端一样，{父变量，子变量列表}
+      nprogress.start()
       this.varInfoList = (await this.$api.varSetting.queryAllVarInfo({ "domain": domain, "projectId": this.projectId })).data.data
+      nprogress.done()
       // 属性
       for (let varInfo of this.varInfoList) {
         const varSettingVo = varInfo.varSettingVo
@@ -511,13 +517,16 @@ export default {
       this.updateShowList()
 
       // 查询 表名 列表
+      nprogress.start()
       this.sheetNameList = (await this.$api.varSetting.querySheetName({ "domain": domain, "projectId": this.projectId })).data.data
-
+      nprogress.done()
       // console.log('in showVarInfo varInfoList', this.varInfoList)
       // console.log('in showVarInfo showList', this.showList)
     },
     async handleSheetNameChange (sheetName) {
+      nprogress.start()
       this.fieldList = (await this.$api.varSetting.queryField({ "sheetName": sheetName, "projectId": this.projectId })).data.data
+      nprogress.done()
     },
     async queryCodeList (variable) {
       const param = {
@@ -527,7 +536,9 @@ export default {
         domain: this.domain,
         variable: variable
       }
+      nprogress.start()
       this.tmpCodeNameList = (await this.$api.varSetting.queryCtInfo(param)).data.data
+      nprogress.done()
     },
     async handleChangeCodeListName (codeListName) {
       this.codeListNameSelected = codeListName
@@ -535,7 +546,9 @@ export default {
         ctVersion: "",
         codeListName: codeListName
       }
+      nprogress.start()
       this.tmpCodeList = (await this.$api.varSetting.queryAllCtCode(param)).data.data
+      nprogress.done()
 
     },
     triggerModifyDict (showIndex) {
@@ -549,7 +562,9 @@ export default {
     async triggerCustomDict (showIndex) {
       this.showIndexInCustomDict = showIndex
       const dictName = this.showList[showIndex].ctName
+      nprogress.start()
       this.customCodeList = (await this.$api.varSetting.queryCustomCT({ dictName: dictName })).data.data
+      nprogress.done()
       this.customDictDialogVisible = true
     },
     addCustomCode () {
@@ -563,7 +578,9 @@ export default {
       })
     },
     deleteCustomCode (ctName, index) {
+      nprogress.start()
       this.$api.varSetting.deleteCustomCT({ dictName: ctName, key: this.customCodeList[index].ctKey }).catch(err => { })
+      nprogress.done()
       this.customCodeList.splice(index, 1)
     },
     saveCustomDict (ctName) {
@@ -575,7 +592,9 @@ export default {
           language: this.language
         }
       })
+      nprogress.start()
       this.$api.varSetting.saveCustomCT(this.customCodeList).catch(err => { })
+      nprogress.done()
       this.showList[this.showIndexInCustomDict].ctCode = this.customCodeList.map(x => (ctName+'-'+x.description+'-'+x.ctKey)).join(';')
       this.customDictDialogVisible = false
     },
@@ -591,8 +610,10 @@ export default {
         "domain": domain,
         "variable": variable
       }
-      // 调用接口删除变量，
+      // 调用接口删除变量
+      nprogress.start()
       this.$api.varSetting.deleteVar(param).catch(err => { console.log(err) })
+      nprogress.done()
       console.log('deleteRow', this.varInfoList)
       // 根据主键variable查找到varInfoList中的变量，variable唯一且不为空
       for (let varIndex in this.varInfoList) {
@@ -619,7 +640,9 @@ export default {
         "domain": this.domain
       }
       // 查询当前域的所有标准变量
+      nprogress.start()
       const standardVarListAll = (await this.$api.varSetting.queryStandardVar(param)).data.data
+      nprogress.done()
       // 只显示当前列表未添加的变量（standardVarListAll-varInfoList）
       this.standardVarList = standardVarListAll.filter(x =>
         !this.varInfoList.find(y => y.varSettingVo.variable == x.variable)
@@ -648,7 +671,9 @@ export default {
       }
       for (let variable of this.selectedStandardVars) {
         param.variable = variable
+        nprogress.start()
         const standardVarInfo = (await this.$api.varSetting.queryVarInfo(param)).data.data
+        nprogress.done()
         // 包装成{varSettingVo，varSettingVoList}
         const varInfo = {
           varSettingVo: standardVarInfo,
@@ -863,10 +888,11 @@ export default {
       }
       console.log(param)
       let that = this
+      nprogress.start()
       this.$api.varSetting.setVlm(param).then(res => {
         that.updateVarInfoListAfterSave()
       }).catch(err => { })
-
+      nprogress.done()
 
     },
 
@@ -891,19 +917,22 @@ export default {
     submitUpload (index) {
       this.$refs['annexUpload' + index].submit()
       const that = this
+      nprogress.start()
       this.$api.config.upload(this.fd).then(res => {
         // annex url
         that.varInfoList[index].annex = res.data.data
         console.log(that.varInfoList[index])
       })
-
+      nprogress.done()
     },
 
     // 每个域都有个保存按钮，调用save接口
     saveVarInfo () {
       this.updateVarInfoListBeforeSave()
       const fatherVarInfoList = this.varInfoList.map(x => x.varSettingVo)
+      nprogress.start()
       this.$api.varSetting.save(fatherVarInfoList).catch(err => { })
+      nprogress.done()
     },
 
     // 继续
